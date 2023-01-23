@@ -15,12 +15,17 @@ import * as sharp from 'sharp';
 import * as path from 'path';
 import { PasienDto } from 'src/dto/auth/pasien.dto';
 import { PasienUpdateDto } from 'src/dto/auth/pasien_update.dto';
+import { PaginationDto } from 'src/dto/pagination/pagination.dto';
+import { PaginationService } from 'src/pagination/pagination.service';
 
 const SALT_PASSWORD = 12;
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService, 
+    private pagination: PaginationService
+    ) {}
 
   async login(LoginDto: LoginDto) {
     const pasien = await this.prisma.pasien.findUnique({
@@ -157,14 +162,19 @@ export class AuthService {
     });
 
     if (!pasien) throw new NotFoundException('Pasien not found');
-    const dataReturn = {
-      status: true,
-      message: 'Pasien found',
-      data: pasien,
-    };
-    // if (pasien.role === 'ADMIN') delete dataReturn.data.fordaArea;
-    delete dataReturn.data.password;
-    return dataReturn;
+    return pasien;
+  }
+
+  async getAllPasien(paginationQuery: PaginationDto) {
+    const pasien = await this.prisma.pasien.findMany();
+    if (!pasien) throw new NotFoundException('Pasien not found');
+
+    const paginationRes = await this.pagination.paginationFilter(
+      paginationQuery,
+      'pasien',
+      pasien,
+    );
+    return paginationRes;
   }
 
   async cekAttempt(

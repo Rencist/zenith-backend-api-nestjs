@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   HttpException,
   Param,
+  Query,
 } from '@nestjs/common';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -21,6 +22,7 @@ import { RolesGuard } from 'src/guards/roles/roles.guard';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from '@prisma/client';
 import { PasienUpdateDto } from 'src/dto/auth/pasien_update.dto';
+import { PaginationDto } from 'src/dto/pagination/pagination.dto';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -56,8 +58,11 @@ export class AuthController {
     try {
       const pasien = await this.authService.login(LoginDto);
       const token = await this.jwtService.create({ uid: pasien.id });
-      const message = 'Login berhasil';
-      return { message, token };
+      return {
+        status: true,
+        message: 'Berhasil Login',
+        data: token,
+      };
     } catch (err) {
       if (err.status) throw new HttpException(err, err.status);
       else throw new InternalServerErrorException(err);
@@ -93,7 +98,28 @@ export class AuthController {
   async getPasien(@Param('pasien_id') pasien_id: string,) {
     try {
       const pasien = await this.authService.getPasien(pasien_id);
-      return pasien;
+      return {
+        status: true,
+        message: 'Berhasil Mendapatkan Data Pasien',
+        data: pasien,
+      };
+    } catch (err) {
+      if (err.status) throw new HttpException(err, err.status);
+      else throw new InternalServerErrorException(err);
+    }
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('')
+  async getAllPasien(@Query() paginationQuery: PaginationDto,) {
+    try {
+      const pasien = await this.authService.getAllPasien(paginationQuery);
+      return {
+        status: true,
+        message: 'Berhasil Mengambil Data Semua Pasien',
+        data: pasien,
+      };
     } catch (err) {
       if (err.status) throw new HttpException(err, err.status);
       else throw new InternalServerErrorException(err);
@@ -105,7 +131,11 @@ export class AuthController {
   async getMe(@Token('uid') uid: string) {
     try {
       const pasien = await this.authService.getPasien(uid);
-      return pasien;
+      return {
+        status: true,
+        message: 'Berhasil Mendapatkan Detail Akun',
+        data: pasien,
+      };
     } catch (err) {
       if (err.status) throw new HttpException(err, err.status);
       else throw new InternalServerErrorException(err);
