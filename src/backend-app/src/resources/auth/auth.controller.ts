@@ -7,13 +7,15 @@ import {
   InternalServerErrorException,
   HttpException,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { FileInjector } from 'nestjs-file-upload';
 import { JwtGuard } from '../../guards/jwt/jwt.guard';
 import { JwtService } from '../../guards/jwt/jwt.service';
 import { LoginDto } from '../../dto/auth/auth.dto';
 import { UserDto } from '../../dto/auth/user.dto';
 import { Token } from '../../decorators/token.decorator';
+import { UserBody } from 'src/decorators/auth/User.decorator';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -24,13 +26,17 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @FileInjector(UserDto)
+  @UserBody()
+  @ApiConsumes('multipart/form-data')
   async register(@Body() User: UserDto) {
     try {
-      const success = await this.authService.register(User);
-      let message = '';
-      if (success) message = 'Register berhasil';
-      else message = 'Register gagal';
-      return { message };
+      const res = await this.authService.register(User);
+      return {
+        status: true,
+        message: 'Berhasil Register',
+        data: res,
+      };
     } catch (err) {
       if (err.status) throw new HttpException(err, err.status);
       else throw new InternalServerErrorException(err);
@@ -38,6 +44,9 @@ export class AuthController {
   }
 
   @Post('login')
+  @FileInjector(UserDto)
+  @UserBody()
+  @ApiConsumes('multipart/form-data')
   async login(@Body() LoginDto: LoginDto) {
     try {
       const user = await this.authService.login(LoginDto);

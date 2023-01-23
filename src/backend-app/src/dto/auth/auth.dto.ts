@@ -5,7 +5,7 @@ export class LoginDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  readonly email: string;
+  readonly no_telp: string;
 
   @IsString()
   @IsNotEmpty()
