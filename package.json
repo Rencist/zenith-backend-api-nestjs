@@ -1,10 +1,10 @@
 {
-  "name": "ilits-2023-backend",
+  "name": "zenith-backend",
   "version": "1.0.0",
   "description": "Backend",
   "main": "index.js",
-  "repository": "https://github.com/ilits2023/ilits-2023-backend.git",
-  "author": "ilits2023",
+  "repository": "https://github.com/zenith/zenith-backend.git",
+  "author": "zenith",
   "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",

@@ -14,7 +14,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('ZENITH')
-    .setDescription('Ini Lho ITS 2023')
+    .setDescription('Zenith')
     .setVersion('1.0')
     .addTag('ZENITH')
     .addBearerAuth()

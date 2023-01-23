@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/robbypambudi/MyOrg/ilits/ilits-2023-backend/package.json: Unexpected token / in JSON at position 770
+  SyntaxError: /Users/robbypambudi/MyOrg/zenith/zenith-2023-backend/package.json: Unexpected token / in JSON at position 770
       at JSON.parse (<anonymous>)
       at /usr/local/Cellar/yarn/1.22.18/libexec/lib/cli.js:1625:59
       at Generator.next (<anonymous>)
@@ -23,12 +23,12 @@ Trace:
 
 npm manifest: 
   {
-    "name": "ilits-2023-backend",
+    "name": "zenith-2023-backend",
     "version": "1.0.0",
     "description": "Backend",
     "main": "index.js",
-    "repository": "https://github.com/ilits2023/ilits-2023-backend.git",
-    "author": "ilits2023",
+    "repository": "https://github.com/zenith2023/zenith-2023-backend.git",
+    "author": "zenith2023",
     "license": "MIT",
     "devDependencies": {
       "@commitlint/cli": "^17.1.2",

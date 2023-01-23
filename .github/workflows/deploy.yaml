@@ -1,4 +1,4 @@
-name: Deploy Inilho ITS Backend Server DO
+name: Deploy Zenith Backend Server DO
 on:
   push:
     branches:
@@ -17,7 +17,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: 18235
           script: |
-            cd /var/www/ilits-2023-backend/src/backend-app
+            cd /var/www/zenith-backend/src/backend-app
             git pull origin develop
             yarn install
             yarn build
