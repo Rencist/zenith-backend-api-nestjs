@@ -1,17 +1,17 @@
 import { ApiBody } from '@nestjs/swagger';
 
-export const CheckInBody =
+export const CheckInGejalaBody =
   (): MethodDecorator =>
   (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
     ApiBody({
       schema: {
         type: 'object',
-        required: ['penyakit', 'pasien_id'],
+        required: ['gejala_id', 'check_in_id'],
         properties: {
-          penyakit: {
+          gejala_id: {
             type: 'string',
           },
-          pasien_id: {
+          check_in_id: {
             type: 'string',
           }
         },

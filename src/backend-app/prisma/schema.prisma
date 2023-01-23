@@ -34,19 +34,31 @@ model Pasien {
 }
 
 model Gejala {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  createdAt DateTime? @default(now())
-  updatedAt DateTime  @default(now())
+  id              String            @id @default(uuid())
+  name            String            @unique
+  createdAt       DateTime?         @default(now())
+  updatedAt       DateTime          @default(now())
+  Check_In_Gejala Check_In_Gejala[]
 }
 
 model Check_In {
-  id        String    @id @default(uuid())
-  penyakit  String    @unique
-  pasien_id String    @default(uuid())
-  pasienId  Pasien?   @relation(fields: [pasien_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime  @default(now())
+  id              String            @id @default(uuid())
+  penyakit        String            @unique
+  pasien_id       String            @default(uuid())
+  pasienId        Pasien?           @relation(fields: [pasien_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt       DateTime?         @default(now())
+  updatedAt       DateTime          @default(now())
+  Check_In_Gejala Check_In_Gejala[]
+}
+
+model Check_In_Gejala {
+  id          String    @id @default(uuid())
+  gejala_id   String    @default(uuid())
+  check_in_id String    @default(uuid())
+  gejalaId    Gejala?   @relation(fields: [gejala_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  checkInId   Check_In? @relation(fields: [check_in_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime  @default(now())
 }
 
 model Login_Attempt {
