@@ -33,7 +33,7 @@ export class ShortenerController {
   @Post('')
   async shorten(@Body() shorten: ShortenerDto, @Token('uid') uid: string) {
     try {
-      shorten.userId = uid;
+      shorten.pasienId = uid;
       const shortener = await this.shortenerService.shorten(shorten);
       if (shortener)
         return {
@@ -118,7 +118,7 @@ export class ShortenerController {
     @Token('uid') uid: string,
   ) {
     try {
-      shorten.userId = uid;
+      shorten.pasienId = uid;
       const url = await this.shortenerService.update(shorten, id);
       if (url)
         return {

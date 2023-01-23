@@ -15,17 +15,17 @@ datasource db {
 
 enum Role {
   ADMIN
-  USER
+  PASIEN
 }
 
-model User {
+model Pasien {
   id           String         @id @default(uuid())
   fullname     String
   no_telp      String         @unique
   alamat       String
   password     String
   foto         String         @db.VarChar(255)
-  role         Role           @default(USER)
+  role         Role           @default(PASIEN)
   shortens     Shorten[]
   loginAttempt Login_Attempt?
   createdAt    DateTime?      @default(now())
@@ -34,8 +34,8 @@ model User {
 
 model Login_Attempt {
   id           Int       @id @default(autoincrement())
-  userId       String    @unique
-  user         User?     @relation(fields: [userId], references: [id])
+  pasienId     String    @unique
+  pasien       Pasien?   @relation(fields: [pasienId], references: [id])
   limitTime    DateTime?
   countAttempt Int
 }
@@ -47,8 +47,8 @@ model Shorten {
   url        String    @db.VarChar(255)
   alias      String    @unique @db.VarChar(255)
   expiration DateTime?
-  userId     String
+  pasienId   String
 
-  createdBy User?    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy Pasien?  @relation(fields: [pasienId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdAt DateTime @default(now())
 }

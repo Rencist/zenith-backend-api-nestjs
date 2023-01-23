@@ -41,7 +41,7 @@ export class ShortenerService {
       const data = await this.prisma.shorten.create({
         data: shorten,
       });
-      delete data.userId;
+      delete data.pasienId;
       delete data.id;
       return data;
     } else throw new BadRequestException('Alias already exist');
@@ -71,7 +71,7 @@ export class ShortenerService {
     if (url) {
       delete url.createdBy.password;
       delete url.createdBy.id;
-      delete url.userId;
+      delete url.pasienId;
     }
 
     return url;
@@ -93,7 +93,7 @@ export class ShortenerService {
       url.data.forEach((url) => {
         delete url.createdBy.password;
         delete url.createdBy.id;
-        delete url.userId;
+        delete url.pasienId;
       });
 
     return url;
@@ -102,7 +102,7 @@ export class ShortenerService {
   async getByUid(uid: string, paginationQuery: PaginationDto) {
     const data = await this.prisma.shorten.findMany({
       where: {
-        userId: uid,
+        pasienId: uid,
       },
       include: {
         createdBy: true,
@@ -119,7 +119,7 @@ export class ShortenerService {
       url.data.forEach((url) => {
         delete url.createdBy.password;
         delete url.createdBy.id;
-        delete url.userId;
+        delete url.pasienId;
       });
 
     return url;
@@ -138,15 +138,15 @@ export class ShortenerService {
       throw new BadRequestException('Url tidak ditemukan');
     }
 
-    const user = await this.prisma.user.findFirst({
+    const pasien = await this.prisma.pasien.findFirst({
       where: {
-        id: shorten.userId,
+        id: shorten.pasienId,
       },
     });
 
     if (
-      url.createdBy.id == shorten.userId ||
-      user.no_telp == 'admin@inilho.its.ac.id'
+      url.createdBy.id == shorten.pasienId ||
+      pasien.no_telp == 'admin@inilho.its.ac.id'
     ) {
       if (!shorten.alias)
         while (!shorten.alias || shorten.alias == '') {
@@ -169,7 +169,7 @@ export class ShortenerService {
           ...shorten,
         },
       });
-      delete updatedUrl.userId;
+      delete updatedUrl.pasienId;
       return updatedUrl;
     } else {
       throw new ForbiddenException();
@@ -186,7 +186,7 @@ export class ShortenerService {
       },
     });
 
-    const user = await this.prisma.user.findFirst({
+    const pasien = await this.prisma.pasien.findFirst({
       where: {
         id: uid,
       },
@@ -196,14 +196,14 @@ export class ShortenerService {
       throw new BadRequestException('Url tidak ditemukan');
     }
 
-    if (url.userId == uid || user.no_telp == 'admin@inilho.its.ac.id') {
+    if (url.pasienId == uid || pasien.no_telp == 'admin@inilho.its.ac.id') {
       const deletedUrl = await this.prisma.shorten.delete({
         where: {
           id,
         },
       });
 
-      delete deletedUrl.userId;
+      delete deletedUrl.pasienId;
       return deletedUrl;
     } else {
       throw new ForbiddenException();

@@ -11,7 +11,7 @@ export class EmailService {
       secure: true,
       pool: true,
       auth: {
-        user: process.env.EMAIL,
+        pasien: process.env.EMAIL,
         pass: process.env.PASS,
       },
     });

@@ -27,9 +27,9 @@ export class ShortenerDto {
   @ApiProperty({
     readOnly: true,
     type: String,
-    description: 'Merupakan UID user pembuat shortener',
+    description: 'Merupakan UID pasien pembuat shortener',
   })
-  userId: string;
+  pasienId: string;
 
   @ApiPropertyOptional({
     type: Number,

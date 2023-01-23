@@ -24,10 +24,10 @@ class FieldExistException extends HttpException {
   }
 }
 
-class UserNotFoundExecption extends HttpException {
+class PasienNotFoundExecption extends HttpException {
   constructor() {
     super('Not Found', HttpStatus.BAD_REQUEST);
-    this.message = 'User not found';
+    this.message = 'pasien not found';
   }
 }
 
@@ -51,5 +51,5 @@ export {
   FieldExistException,
   FieldEmptyException,
   UnknownErrorException,
-  UserNotFoundExecption,
+  PasienNotFoundExecption,
 };

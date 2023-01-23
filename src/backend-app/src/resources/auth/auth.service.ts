@@ -6,14 +6,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { LoginDto } from '../../dto/auth/auth.dto';
-import { UserDto } from '../../dto/auth/user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { compare, hash } from 'bcrypt';
-import { Login_Attempt, Prisma, User } from '@prisma/client';
+import { Login_Attempt, Prisma, Pasien } from '@prisma/client';
 import { uploadFiles } from 'src/dto/auth/uploadFiles.dto';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
 import * as path from 'path';
+import { PasienDto } from 'src/dto/auth/pasien.dto';
 
 const SALT_PASSWORD = 12;
 
@@ -22,7 +22,7 @@ export class AuthService {
   constructor(private prisma: PrismaService) {}
 
   async login(LoginDto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
+    const pasien = await this.prisma.pasien.findUnique({
       where: {
         no_telp: LoginDto.no_telp,
       },
@@ -31,11 +31,11 @@ export class AuthService {
       },
     });
 
-    if (!user)
+    if (!pasien)
       throw new UnauthorizedException('No Telp / Password not valid');
 
     //cek login attempt
-    const _cekAttempt = await this.cekAttempt(user);
+    const _cekAttempt = await this.cekAttempt(pasien);
     if (!_cekAttempt.status)
       throw new HttpException(
         `Terlalu banyak mencoba. Tunggu ${_cekAttempt.second} detik untuk mencoba kembali.`,
@@ -43,14 +43,14 @@ export class AuthService {
       );
 
     // compare passwords
-    const areEqual = await compare(LoginDto.password, user.password);
+    const areEqual = await compare(LoginDto.password, pasien.password);
     if (!areEqual)
       throw new UnauthorizedException('No Telp / Passoword not valid');
 
     // reset login attempt
     await this.prisma.login_Attempt.update({
       where: {
-        userId: user.id,
+        pasienId: pasien.id,
       },
       data: {
         countAttempt: 0,
@@ -58,79 +58,79 @@ export class AuthService {
       },
     });
 
-    delete user.password;
-    return user;
+    delete pasien.password;
+    return pasien;
   }
 
-  async register(User: UserDto) {
-    const checkUser = await this.prisma.user.findUnique({
+  async register(Pasien: PasienDto) {
+    const checkPasien = await this.prisma.pasien.findUnique({
       where: {
-        no_telp: User.no_telp,
+        no_telp: Pasien.no_telp,
       },
     });
 
-    if (checkUser) {
+    if (checkPasien) {
       throw new BadRequestException('No Telp sudah terdaftar');
     }
     const uploadFoto: uploadFiles = {
-      fileIs: User.foto,
-      no_telp: User.no_telp,
-      path: 'src/uploads/user',
+      fileIs: Pasien.foto,
+      no_telp: Pasien.no_telp,
+      path: 'src/uploads/pasien',
       res: 'foto',
     };
     await this.uploadFile(uploadFoto);
 
-    const newdata: Prisma.UserUncheckedCreateInput = {
-      fullname: User.fullname,
-      no_telp: User.no_telp,
-      alamat: User.alamat,
-      password: User.password,
+    const newdata: Prisma.PasienUncheckedCreateInput = {
+      fullname: Pasien.fullname,
+      no_telp: Pasien.no_telp,
+      alamat: Pasien.alamat,
+      password: Pasien.password,
       foto:
-        '/user/foto/' +
+        '/pasien/foto/' +
         uploadFoto.no_telp +
         '-' +
         uploadFoto.res +
         '.jpeg',
     };
     const success = new Promise((resolve, reject) => {
-      hash(User.password, SALT_PASSWORD, async (err, hash) => {
+      hash(Pasien.password, SALT_PASSWORD, async (err, hash) => {
         newdata.password = hash;
 
-        const user = await this.prisma.user.create({
+        const pasien = await this.prisma.pasien.create({
           data: newdata,
         });
-        if (!user) reject();
-        resolve(user);
+        if (!pasien) reject();
+        resolve(pasien);
       });
     });
     return success;
   }
 
-  async getUser(id: string) {
-    const user = await this.prisma.user.findUnique({
+  async getPasien(id: string) {
+    const pasien = await this.prisma.pasien.findUnique({
       where: { id: id },
     });
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!pasien) throw new NotFoundException('Pasien not found');
     const dataReturn = {
       status: true,
-      message: 'User found',
-      data: user,
+      message: 'Pasien found',
+      data: pasien,
     };
-    // if (user.role === 'ADMIN') delete dataReturn.data.fordaArea;
+    // if (pasien.role === 'ADMIN') delete dataReturn.data.fordaArea;
     delete dataReturn.data.password;
     return dataReturn;
   }
 
   async cekAttempt(
-    user: User & { loginAttempt: Login_Attempt },
+    pasien: Pasien & { loginAttempt: Login_Attempt },
   ): Promise<{ status: boolean; second?: number }> {
     let res = true;
     let second = 0;
-    if (user.loginAttempt) {
-      if (user.loginAttempt.limitTime) {
+    if (pasien.loginAttempt) {
+      if (pasien.loginAttempt.limitTime) {
         const nowDateTime: number = new Date().getTime() / 1000;
-        let sub = nowDateTime - user.loginAttempt.limitTime.getTime() / 1000;
+        let sub = nowDateTime - pasien.loginAttempt.limitTime.getTime() / 1000;
         sub = Math.round(sub);
         if (sub < 0) {
           res = false;
@@ -140,13 +140,13 @@ export class AuthService {
           };
         }
       }
-      if (user.loginAttempt.countAttempt >= 3) {
+      if (pasien.loginAttempt.countAttempt >= 3) {
         const date = new Date();
         date.setMinutes(date.getMinutes() + 3);
         await this.prisma.login_Attempt
           .update({
             where: {
-              userId: user.id,
+              pasienId: pasien.id,
             },
             data: {
               countAttempt: 0,
@@ -160,17 +160,17 @@ export class AuthService {
       } else {
         await this.prisma.login_Attempt.update({
           where: {
-            userId: user.id,
+            pasienId: pasien.id,
           },
           data: {
-            countAttempt: ++user.loginAttempt.countAttempt,
+            countAttempt: ++pasien.loginAttempt.countAttempt,
           },
         });
       }
     } else {
       await this.prisma.login_Attempt.create({
         data: {
-          userId: user.id,
+          pasienId: pasien.id,
           countAttempt: 1,
         },
       });

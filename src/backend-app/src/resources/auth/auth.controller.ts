@@ -13,9 +13,9 @@ import { FileInjector } from 'nestjs-file-upload';
 import { JwtGuard } from '../../guards/jwt/jwt.guard';
 import { JwtService } from '../../guards/jwt/jwt.service';
 import { LoginDto } from '../../dto/auth/auth.dto';
-import { UserDto } from '../../dto/auth/user.dto';
 import { Token } from '../../decorators/token.decorator';
-import { UserBody } from 'src/decorators/auth/User.decorator';
+import { PasienDto } from 'src/dto/auth/pasien.dto';
+import { PasienBody } from 'src/decorators/auth/pasien.decorator';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -26,12 +26,12 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  @FileInjector(UserDto)
-  @UserBody()
+  @FileInjector(PasienDto)
+  @PasienBody()
   @ApiConsumes('multipart/form-data')
-  async register(@Body() User: UserDto) {
+  async register(@Body() Pasien: PasienDto) {
     try {
-      const res = await this.authService.register(User);
+      const res = await this.authService.register(Pasien);
       return {
         status: true,
         message: 'Berhasil Register',
@@ -44,13 +44,13 @@ export class AuthController {
   }
 
   @Post('login')
-  @FileInjector(UserDto)
-  @UserBody()
+  @FileInjector(PasienDto)
+  @PasienBody()
   @ApiConsumes('multipart/form-data')
   async login(@Body() LoginDto: LoginDto) {
     try {
-      const user = await this.authService.login(LoginDto);
-      const token = await this.jwtService.create({ uid: user.id });
+      const pasien = await this.authService.login(LoginDto);
+      const token = await this.jwtService.create({ uid: pasien.id });
       const message = 'Login berhasil';
       return { message, token };
     } catch (err) {
@@ -63,8 +63,8 @@ export class AuthController {
   @Get('me')
   async getMe(@Token('uid') uid: string) {
     try {
-      const user = await this.authService.getUser(uid);
-      return user;
+      const pasien = await this.authService.getPasien(uid);
+      return pasien;
     } catch (err) {
       if (err.status) throw new HttpException(err, err.status);
       else throw new InternalServerErrorException(err);

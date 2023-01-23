@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { FileField, File } from 'nestjs-file-upload';
 import { Expose } from 'class-transformer';
 
-export class UserDto {
+export class PasienDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
