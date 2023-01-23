@@ -14,6 +14,7 @@ import * as fs from 'fs';
 import * as sharp from 'sharp';
 import * as path from 'path';
 import { PasienDto } from 'src/dto/auth/pasien.dto';
+import { PasienUpdateDto } from 'src/dto/auth/pasien_update.dto';
 
 const SALT_PASSWORD = 12;
 
@@ -104,6 +105,50 @@ export class AuthService {
       });
     });
     return success;
+  }
+
+  async updatePasien(pasien_id: string, data: PasienUpdateDto) {
+    const cekUser = await this.prisma.pasien.findFirst({
+      where: {
+        id: pasien_id,
+      },
+    });
+    if (!cekUser) {
+      throw new BadRequestException('Forda Order tidak ditemukan');
+    }
+    const forda_member = await this.prisma.pasien.findFirst({
+      where: {
+        id: pasien_id,
+      }
+    });
+    const uploadFoto: uploadFiles = {
+      fileIs: data.foto,
+      no_telp: forda_member.no_telp,
+      path: 'src/uploads/pasien',
+      res: 'foto',
+    };
+    await this.uploadFile(uploadFoto);
+
+    const newdata: Prisma.PasienUncheckedUpdateInput = {
+      fullname: data.fullname,
+      no_telp: data.no_telp,
+      alamat: data.alamat,
+      password: data.password,
+      foto:
+        '/pasien/foto/' +
+        uploadFoto.no_telp +
+        '-' +
+        uploadFoto.res +
+        '.jpeg',
+    };
+
+    const result = await this.prisma.pasien.update({
+      where: {
+        id: pasien_id,
+      },
+      data: newdata,
+    });
+    return result;
   }
 
   async getPasien(id: string) {
