@@ -30,11 +30,21 @@ model Pasien {
   loginAttempt Login_Attempt?
   createdAt    DateTime?      @default(now())
   updatedAt    DateTime       @default(now())
+  Check_In     Check_In[]
 }
 
 model Gejala {
   id        String    @id @default(uuid())
   name      String    @unique
+  createdAt DateTime? @default(now())
+  updatedAt DateTime  @default(now())
+}
+
+model Check_In {
+  id        String    @id @default(uuid())
+  penyakit  String    @unique
+  pasien_id String    @default(uuid())
+  pasienId  Pasien?   @relation(fields: [pasien_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdAt DateTime? @default(now())
   updatedAt DateTime  @default(now())
 }
