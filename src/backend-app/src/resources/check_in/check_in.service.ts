@@ -72,4 +72,41 @@ export class CheckInService {
     if (!checkIn) throw new BadRequestException('Check In not found');
     return checkIn;
   }
+
+  async getDetailCheckIn(check_in_id: string) {
+    const checkIn = await this.prisma.check_In.findFirst({
+      where: {
+        id: check_in_id
+      }
+    });
+    const checkInGejala = await this.prisma.check_In_Gejala.findMany({
+      where: {
+        check_in_id: check_in_id
+      }
+    })
+    const prom = new Promise((resolve, reject) => {
+      const result = {
+        penyakit: checkIn.penyakit,
+        gejala: [],
+        date: new Date(checkIn.createdAt).toLocaleDateString('en-US', {
+          timeZone: 'Asia/Jakarta'
+      })
+      };
+      let i = 0;
+      checkInGejala.forEach(async (datum) => {
+        const result2 = await this.prisma.gejala.findFirst({
+          where:{
+            id: datum.gejala_id
+          }
+        });
+        if (await result2) {
+          result.gejala.push(result2.name);
+          i++;
+          if(i == checkInGejala.length) resolve(result);
+        }
+        
+      });
+    });
+    return await prom;
+  }
 }

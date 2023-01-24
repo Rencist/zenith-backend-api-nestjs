@@ -49,7 +49,7 @@ export class CheckInController {
   }
 
   @UseGuards(JwtGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(Role.PASIEN)
   @Get('')
   async getAllCheckIn() {
     try {
@@ -71,6 +71,23 @@ export class CheckInController {
   async getMeCheckIn(@Token('uid') pasien_id: string) {
     try {
       const checkIn = await this.checkInService.getMeCheckIn(pasien_id);
+      return {
+        status: true,
+        message: 'Berhasil Mengambil Data Check In',
+        data: checkIn,
+      };
+    } catch (err) {
+      if (err.status) throw new HttpException(err, err.status);
+      else throw new InternalServerErrorException(err);
+    }
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.PASIEN)
+  @Get('/detail/:check_in_id')
+  async getDetailCheckIn(@Param('check_in_id') check_in_id: string) {
+    try {
+      const checkIn = await this.checkInService.getDetailCheckIn(check_in_id);
       return {
         status: true,
         message: 'Berhasil Mengambil Data Check In',

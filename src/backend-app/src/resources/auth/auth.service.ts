@@ -119,16 +119,16 @@ export class AuthService {
       },
     });
     if (!cekUser) {
-      throw new BadRequestException('Forda Order tidak ditemukan');
+      throw new BadRequestException('Pasien tidak ditemukan');
     }
-    const forda_member = await this.prisma.pasien.findFirst({
+    const pasien = await this.prisma.pasien.findFirst({
       where: {
         id: pasien_id,
       }
     });
     const uploadFoto: uploadFiles = {
       fileIs: data.foto,
-      no_telp: forda_member.no_telp,
+      no_telp: pasien.no_telp,
       path: 'src/uploads/pasien',
       res: 'foto',
     };
