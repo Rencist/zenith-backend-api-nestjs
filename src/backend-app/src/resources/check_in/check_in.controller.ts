@@ -7,6 +7,7 @@ import {
   HttpException,
   UseGuards,
   UseInterceptors,
+  Param,
 } from '@nestjs/common';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInjector } from 'nestjs-file-upload';
@@ -45,15 +46,10 @@ export class CheckInController {
       if (err.status) throw new HttpException(err, err.status);
       else throw new InternalServerErrorException(err);
     }
-    // return {
-    //   status: true,
-    //   message: 'Berhasil Menambahkan Check In',
-    //   data: data,
-    // };
   }
 
   @UseGuards(JwtGuard, RolesGuard)
-  @Roles(Role.PASIEN)
+  @Roles(Role.ADMIN)
   @Get('')
   async getAllCheckIn() {
     try {
@@ -61,6 +57,23 @@ export class CheckInController {
       return {
         status: true,
         message: 'Berhasil Mengambil Data Semua Check In',
+        data: checkIn,
+      };
+    } catch (err) {
+      if (err.status) throw new HttpException(err, err.status);
+      else throw new InternalServerErrorException(err);
+    }
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.PASIEN)
+  @Get('/me')
+  async getMeCheckIn(@Token('uid') pasien_id: string) {
+    try {
+      const checkIn = await this.checkInService.getMeCheckIn(pasien_id);
+      return {
+        status: true,
+        message: 'Berhasil Mengambil Data Check In',
         data: checkIn,
       };
     } catch (err) {

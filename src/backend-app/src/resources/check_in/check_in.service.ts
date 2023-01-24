@@ -61,4 +61,15 @@ export class CheckInService {
     if (!checkIn) throw new BadRequestException('Check In not found');
     return checkIn;
   }
+
+  async getMeCheckIn(pasien_id: string) {
+    const checkIn = await this.prisma.check_In.findMany({
+      where: {
+        pasien_id: pasien_id
+      }
+    });
+
+    if (!checkIn) throw new BadRequestException('Check In not found');
+    return checkIn;
+  }
 }

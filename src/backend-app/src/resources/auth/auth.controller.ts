@@ -95,7 +95,7 @@ export class AuthController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Get(':pasien_id')
-  async getPasien(@Param('pasien_id') pasien_id: string,) {
+  async getPasien(@Param('pasien_id') pasien_id: string) {
     try {
       const pasien = await this.authService.getPasien(pasien_id);
       return {
