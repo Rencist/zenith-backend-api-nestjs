@@ -1,5 +1,7 @@
-import { IsString, IsNotEmpty} from 'class-validator';
+import { IsString, IsNotEmpty, ValidateNested, IsOptional} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { GejalaDto } from 'src/dto/gejala/gejala.dto';
 
 export class CheckInDto {
   @IsString()
@@ -8,7 +10,11 @@ export class CheckInDto {
   penyakit: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   pasien_id: string;
+
+  @ApiProperty({ type: () => [GejalaDto] })
+  @ValidateNested({ each: true })
+  @Type(() => GejalaDto)
+  @IsOptional()
+  gejala: GejalaDto[];
 }

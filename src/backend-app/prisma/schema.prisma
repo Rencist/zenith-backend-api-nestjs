@@ -43,7 +43,7 @@ model Gejala {
 
 model Check_In {
   id              String            @id @default(uuid())
-  penyakit        String            @unique
+  penyakit        String
   pasien_id       String            @default(uuid())
   pasienId        Pasien?           @relation(fields: [pasien_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   createdAt       DateTime?         @default(now())
