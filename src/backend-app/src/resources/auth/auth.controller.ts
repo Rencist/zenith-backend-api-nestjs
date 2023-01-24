@@ -31,7 +31,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
   ) {}
-
+    
   @Post('register')
   @FileInjector(PasienDto)
   @PasienBody()
@@ -92,6 +92,22 @@ export class AuthController {
     }
   }
 
+  @UseGuards(JwtGuard)
+  @Get('me')
+  async getMe(@Token('uid') uid: string) {
+    try {
+      const pasien = await this.authService.getPasien(uid);
+      return {
+        status: true,
+        message: 'Berhasil Mendapatkan Detail Akun',
+        data: pasien,
+      };
+    } catch (err) {
+      if (err.status) throw new HttpException(err, err.status);
+      else throw new InternalServerErrorException(err);
+    }
+  }
+  
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Get(':pasien_id')
@@ -108,7 +124,7 @@ export class AuthController {
       else throw new InternalServerErrorException(err);
     }
   }
-
+  
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Get('')
@@ -126,19 +142,4 @@ export class AuthController {
     }
   }
 
-  @UseGuards(JwtGuard)
-  @Get('me')
-  async getMe(@Token('uid') uid: string) {
-    try {
-      const pasien = await this.authService.getPasien(uid);
-      return {
-        status: true,
-        message: 'Berhasil Mendapatkan Detail Akun',
-        data: pasien,
-      };
-    } catch (err) {
-      if (err.status) throw new HttpException(err, err.status);
-      else throw new InternalServerErrorException(err);
-    }
-  }
 }

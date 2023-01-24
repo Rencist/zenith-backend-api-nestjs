@@ -18,7 +18,7 @@ import { PasienUpdateDto } from 'src/dto/auth/pasien_update.dto';
 import { PaginationDto } from 'src/dto/pagination/pagination.dto';
 import { PaginationService } from 'src/pagination/pagination.service';
 
-const SALT_PASSWORD = 12;
+const SALT_PASSWORD = 13;
 
 @Injectable()
 export class AuthService {
